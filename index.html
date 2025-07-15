@@ -68,6 +68,14 @@
                 </button>
                 <div id="filter-panel" class="bg-gray-800 rounded-b-lg p-4">
                     <div class="border border-gray-700 rounded-lg p-3 mb-4">
+                        <h4 class="font-semibold mb-2">Grade (Bisa pilih banyak):</h4>
+                        <div id="grade-filters" class="flex flex-wrap gap-2">
+                            <button class="filter-btn bg-gray-700 text-gray-300" data-group="grade" data-filter="G1">G1</button>
+                            <button class="filter-btn bg-gray-700 text-gray-300" data-group="grade" data-filter="G2">G2</button>
+                            <button class="filter-btn bg-gray-700 text-gray-300" data-group="grade" data-filter="G3">G3</button>
+                        </div>
+                    </div>
+                    <div class="border border-gray-700 rounded-lg p-3 mb-4">
                         <h4 class="font-semibold mb-2">Jarak Lari (Bisa pilih banyak):</h4>
                         <div id="distance-filters" class="flex flex-wrap gap-2">
                             <button class="filter-btn bg-gray-700 text-gray-300" data-group="distance" data-filter="sprint">Sprint</button>
@@ -241,6 +249,7 @@
         const filterPanel = document.getElementById('filter-panel');
         const filterArrow = document.getElementById('filter-arrow');
 
+        let activeGradeFilters = [];
         let activeDistanceFilters = [];
         let activeYearFilter = 'all';
 
@@ -256,10 +265,11 @@
             const searchTerm = searchBar.value.toLowerCase();
 
             const filteredRaces = raceData.filter(race => {
+                const matchesGrade = activeGradeFilters.length === 0 || activeGradeFilters.includes(race.grade);
                 const matchesDistance = activeDistanceFilters.length === 0 || activeDistanceFilters.includes(race.distance);
                 const matchesYear = activeYearFilter === 'all' || race.year.toLowerCase() === activeYearFilter;
                 const matchesSearch = race.name.toLowerCase().includes(searchTerm);
-                return matchesDistance && matchesYear && matchesSearch;
+                return matchesGrade && matchesDistance && matchesYear && matchesSearch;
             });
 
             if (filteredRaces.length === 0) {
@@ -353,6 +363,9 @@
                         document.querySelectorAll(`#year-filters .filter-btn.active`).forEach(btn => btn.classList.remove('active'));
                         e.target.classList.add('active');
                         activeYearFilter = filter;
+                    } else if (group === 'grade') {
+                        e.target.classList.toggle('active');
+                        activeGradeFilters = Array.from(document.querySelectorAll('#grade-filters .filter-btn.active')).map(btn => btn.dataset.filter);
                     }
                     renderTrophies();
                 });
